@@ -8,9 +8,10 @@
  * What I would've done if I had more time:
  * - Made the EXTERNAL_BASE_PATH field less generic if there was more than one external endpoint.
  * - Extended this controller to make use of the albums, photos, todos and users endpoints.
+ * - Applied validation on the create and update methods of the whole Post object i.e. validateChangeRequestData
  */
 
-const Typicode = require("../models/post.model");
+const Post = require("../models/post.model");
 const fetch = require('node-fetch');
 
 // The assumption is that this is the only external base path.
@@ -23,33 +24,28 @@ const failedRequestMsg = 'Something went wrong, please check the code and the er
 // Create a single post.
 exports.createPost = (async (req, res) => {
     const reqMethod = 'POST';
+    const methodName = 'createPost';
 
     try {
+        // Assigning values to the post object
+        var post = new Post();
+        post.fill({userId: req.body.userId, title: req.body.title, body: req.body.body});
+
         // Validate request
-        if (!req.body.title) {
-            const validationMsg = 'Content cannot be empty.';
-
-            res.status(400).send({
-                message: validationMsg
-            });
-
-            logRequestResultToConsole(reqMethod, 'createPost', validationMsg);
-
-            return;
-        }
+        // const reqValidation = validateChangeRequestData(post, res);
+        //
+        // if (reqValidation.status === 400) {
+        //     logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+        //
+        //     return reqValidation;
+        // }
 
         // Storing the request options after validation
         const requestOptions = {
             method: reqMethod,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({title: 'React POST Request Example'})
+            body: JSON.stringify(post)
         };
-
-        // Create Post
-        var typicode = new Typicode(req.body.userId,
-            req.body.id,
-            req.body.title,
-            req.body.body);
 
         const apiResponse = await fetch(
             EXTERNAL_BASE_PATH + '/posts',
@@ -57,11 +53,11 @@ exports.createPost = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        logRequestResultToConsole(reqMethod, 'createPost', successfulRequestMsg);
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
-        logRequestResultToConsole(reqMethod, 'createPost', failedRequestMsg);
+        logRequestResultToConsole(reqMethod, methodName, failedRequestMsg);
         console.log(err);
         res.status(500).send(failedRequestMsg);
     }
@@ -105,20 +101,26 @@ exports.updatePostById = (async (req, res) => {
     const methodName = 'updatePostById';
 
     try {
+        // Assigning values to the post object - using the id from the path in case the API consumer changes it
+        var post = new Post(req.body.userId,
+            id,
+            req.body.title,
+            req.body.body);
+
         // Validate request
-        const reqValidation = validateChangeRequestId(id, res);
-
-        if (reqValidation.status === 400) {
-            logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
-
-            return reqValidation;
-        }
+        // const reqValidation = validateChangeRequestData(post, res);
+        //
+        // if (reqValidation.status === 400) {
+        //     logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+        //
+        //     return reqValidation;
+        // }
 
         // Storing the request options after validation
         const requestOptions = {
             method: reqMethod,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({title: 'React PUT Request Example'})
+            body: JSON.stringify(post)
         };
 
         const apiResponse = await fetch(
@@ -234,7 +236,7 @@ exports.findCommentsByPostId = (async (req, res) => {
  */
 
 // Validation for single item requests.
-// Named this "...ChangeRequest..." to maintain its generic nature because it is applied on update or delete methods.
+// Named this "...ChangeRequest..." to maintain its generic nature because it is applied on both update and delete methods.
 function validateChangeRequestId(id, res) {
     if (!id || isNaN(id)) {
         res.status(400).send({
@@ -246,11 +248,22 @@ function validateChangeRequestId(id, res) {
 }
 
 // Validation for single entry Post requests.
-function validateTypicodeCreateRequest(id, res) {
-    if (!id || isNaN(id)) {
-        res.status(400).send({
-            message: "Id cannot be empty!"
-        });
+function validateChangeRequestData(postObj, res) {
+    let isValid = true;
+    let validationMsg = '';
+
+    for (var field in postObj) {
+        if (Object.prototype.hasOwnProperty.call(postObj, field)) {
+            if (field === 'userId' || field === 'id') {
+                if (isNaN(postObj[field])) {
+                    validationMsg = ((!validationMsg) ? validationMsg : + ', ' + validationMsg);
+                    isValid = false;
+                }
+            }
+        } else {
+            validationMsg = ((!validationMsg) ? validationMsg : + ', ' + validationMsg);
+            isValid = false;
+        }
     }
 
     return res;
