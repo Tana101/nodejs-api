@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 
@@ -25,5 +26,6 @@ require("./app/routes/api.routes")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
+    console.log(dotenv.parsed);
     console.log(`Server is running on port ${PORT}.`);
 });

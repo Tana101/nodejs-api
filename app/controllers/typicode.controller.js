@@ -6,14 +6,14 @@
  * Used anonymous functions to store the controller actions in exportable variables.
  *
  * What I would've done if I had more time:
- * - Made the externalBasePath field less generic if there was more than one external endpoint.
+ * - Made the EXTERNAL_BASE_PATH field less generic if there was more than one external endpoint.
  * - Extended this controller to make use of the albums, photos, todos and users endpoints.
  */
 
 const Typicode = require("../models/post.model");
 
 // The assumption is that this is the only external base path.
-const externalBasePath = 'https://jsonplaceholder.typicode.com';
+const EXTERNAL_BASE_PATH = process.env.TYPICODE_JSON_BASE_PATH;
 
 
 // Create a single post.
@@ -41,7 +41,7 @@ exports.createPost = (async (req, res) => {
             req.body.body);
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts',
+            EXTERNAL_BASE_PATH + '/posts',
             requestOptions
         );
 
@@ -68,7 +68,7 @@ exports.findPostById = (async (req, res) => {
         }
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts/' + id
+            EXTERNAL_BASE_PATH + '/posts/' + id
         );
 
         const apiResponseJson = await apiResponse.json();
@@ -101,7 +101,7 @@ exports.updatePostById = (async (req, res) => {
         };
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts/' + id,
+            EXTERNAL_BASE_PATH + '/posts/' + id,
             requestOptions
         );
 
@@ -133,7 +133,7 @@ exports.deletePostById = (async (req, res) => {
         };
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts/' + id,
+            EXTERNAL_BASE_PATH + '/posts/' + id,
             requestOptions
         );
 
@@ -153,7 +153,7 @@ exports.findAllPosts = (async (req, res) => {
         // It is not necessary to validate this GET request.
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts'
+            EXTERNAL_BASE_PATH + '/posts'
         );
 
         const apiResponseJson = await apiResponse.json();
@@ -178,7 +178,7 @@ exports.findCommentsByPostId = (async (req, res) => {
         }
 
         const apiResponse = await fetch(
-            externalBasePath + '/posts/' + id + '/comments'
+            EXTERNAL_BASE_PATH + '/posts/' + id + '/comments'
         );
 
         const apiResponseJson = await apiResponse.json();
