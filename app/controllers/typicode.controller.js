@@ -16,21 +16,31 @@ const fetch = require('node-fetch');
 // The assumption is that this is the only external base path.
 const EXTERNAL_BASE_PATH = process.env.TYPICODE_JSON_BASE_PATH;
 
+const successfulRequestMsg = 'Request processed successfully.';
+const failedRequestMsg = 'Something went wrong, please check the code and the error message below.';
+
 
 // Create a single post.
 exports.createPost = (async (req, res) => {
+    const reqMethod = 'POST';
+
     try {
         // Validate request
         if (!req.body.title) {
+            const validationMsg = 'Content cannot be empty.';
+
             res.status(400).send({
-                message: "Content cannot be empty!"
+                message: validationMsg
             });
+
+            logRequestResultToConsole(reqMethod, 'createPost', validationMsg);
+
             return;
         }
 
         // Storing the request options after validation
         const requestOptions = {
-            method: 'POST',
+            method: reqMethod,
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({title: 'React POST Request Example'})
         };
@@ -47,24 +57,29 @@ exports.createPost = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
+        logRequestResultToConsole(reqMethod, 'createPost', successfulRequestMsg);
 
-        console.log(apiResponseJson);
-        res.send('Done – check console log');
+        res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, 'createPost', failedRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong')
+        res.status(500).send(failedRequestMsg);
     }
 });
 
 // Find a single post with an id.
 exports.findPostById = (async (req, res) => {
     const id = req.params.id;
+    const reqMethod = 'GET';
+    const methodName = 'findPostById';
 
     try {
         // Validate request
         const reqValidation = validateChangeRequestId(id, res);
 
         if (reqValidation.status === 400) {
+            logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+
             return reqValidation;
         }
 
@@ -73,30 +88,35 @@ exports.findPostById = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log(apiResponseJson);
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, methodName, failedRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong.')
+        res.status(500).send(failedRequestMsg);
     }
 });
 
 // Update a single post with an id.
 exports.updatePostById = (async (req, res) => {
     const id = req.params.id;
+    const reqMethod = 'PUT';
+    const methodName = 'updatePostById';
 
     try {
         // Validate request
         const reqValidation = validateChangeRequestId(id, res);
 
         if (reqValidation.status === 400) {
+            logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+
             return reqValidation;
         }
 
         // Storing the request options after validation
         const requestOptions = {
-            method: 'PUT',
+            method: reqMethod,
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({title: 'React PUT Request Example'})
         };
@@ -107,30 +127,35 @@ exports.updatePostById = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log(apiResponseJson);
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, methodName, failedRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong.')
+        res.status(500).send(failedRequestMsg);
     }
 });
 
 // Delete a single post with an id.
 exports.deletePostById = (async (req, res) => {
     const id = req.params.id;
+    const reqMethod = 'DELETE';
+    const methodName = 'deletePostById';
 
     try {
         // Validate request
         const reqValidation = validateChangeRequestId(id, res);
 
         if (reqValidation.status === 400) {
+            logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+
             return reqValidation;
         }
 
         // Storing the request options after validation
         const requestOptions = {
-            method: 'DELETE'
+            method: reqMethod
         };
 
         const apiResponse = await fetch(
@@ -139,17 +164,21 @@ exports.deletePostById = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log(apiResponseJson);
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, methodName, failedRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong.')
+        res.status(500).send(failedRequestMsg);
     }
 });
 
 // Retrieve all post entries from the resource.
 exports.findAllPosts = (async (req, res) => {
+    const reqMethod = 'GET';
+    const methodName = 'findAllPosts';
+
     try {
         // It is not necessary to validate this GET request.
 
@@ -158,24 +187,29 @@ exports.findAllPosts = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log('findAllPosts: Request processed successfully');
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, methodName, failedRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong.')
+        res.status(500).send(failedRequestMsg);
     }
 });
 
 // Find comments with a post id.
 exports.findCommentsByPostId = (async (req, res) => {
     const id = req.params.id;
+    const reqMethod = 'GET';
+    const methodName = 'findCommentsByPostId';
 
     try {
         // Validate request
         const reqValidation = validateChangeRequestId(id, res);
 
         if (reqValidation.status === 400) {
+            logRequestResultToConsole(reqMethod, methodName, reqValidation.status.message);
+
             return reqValidation;
         }
 
@@ -184,21 +218,27 @@ exports.findCommentsByPostId = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log(apiResponseJson);
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
+        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
         console.log(err);
-        res.status(500).send('Something went wrong.')
+        res.status(500).send(failedRequestMsg);
     }
 });
+
+
+/**
+ * Helper Functions:
+ */
 
 // Validation for single item requests.
 // Named this "...ChangeRequest..." to maintain its generic nature because it is applied on update or delete methods.
 function validateChangeRequestId(id, res) {
     if (!id || isNaN(id)) {
         res.status(400).send({
-            message: "Id cannot be empty!"
+            message: "Id cannot be empty."
         });
     }
 
@@ -214,4 +254,9 @@ function validateTypicodeCreateRequest(id, res) {
     }
 
     return res;
+}
+
+// Validation for single entry Post requests.
+function logRequestResultToConsole(requestMethod, name, message) {
+    console.log('[' + requestMethod + '] ' + name + ': ' + message);
 }
