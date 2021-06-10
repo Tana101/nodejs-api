@@ -11,6 +11,7 @@
  */
 
 const Typicode = require("../models/post.model");
+const fetch = require('node-fetch');
 
 // The assumption is that this is the only external base path.
 const EXTERNAL_BASE_PATH = process.env.TYPICODE_JSON_BASE_PATH;
@@ -157,8 +158,9 @@ exports.findAllPosts = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        console.log(apiResponseJson);
-        res.send('Done – check console log');
+        console.log('findAllPosts: Request processed successfully');
+
+        res.send(apiResponseJson);
     } catch (err) {
         console.log(err);
         res.status(500).send('Something went wrong.')
