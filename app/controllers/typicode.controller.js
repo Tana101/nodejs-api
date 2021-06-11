@@ -8,7 +8,9 @@
  * What I would've done if I had more time:
  * - Made the EXTERNAL_BASE_PATH field less generic if there was more than one external endpoint.
  * - Extended this controller to make use of the albums, photos, todos and users endpoints.
- * - Applied validation on the create and update methods of the whole Post object i.e. validateChangeRequestData
+ * - Applied validation on the create and update methods of the whole Post object i.e. validateChangeRequestData.
+ * - Used the reqMethod provided by Node JS in the req object.
+ * - Cleaned up the code and added more JS Doc
  */
 
 const Post = require("../models/post.model");
@@ -53,7 +55,8 @@ exports.createPost = (async (req, res) => {
         );
 
         const apiResponseJson = await apiResponse.json();
-        logRequestResultToConsole(reqMethod, methodName, successfulRequestMsg);
+        logRequestResultToConsole(reqMethod, methodName + ' ' + JSON.stringify(apiResponseJson) + ': ',
+            successfulRequestMsg);
 
         res.send(apiResponseJson);
     } catch (err) {
@@ -67,7 +70,7 @@ exports.createPost = (async (req, res) => {
 exports.findPostById = (async (req, res) => {
     const id = req.params.id;
     const reqMethod = 'GET';
-    const methodName = 'findPostById';
+    const methodName = 'findPostById - ' + id;
 
     try {
         // Validate request
@@ -98,7 +101,7 @@ exports.findPostById = (async (req, res) => {
 exports.updatePostById = (async (req, res) => {
     const id = req.params.id;
     const reqMethod = 'PUT';
-    const methodName = 'updatePostById';
+    const methodName = 'updatePostById ' + id;
 
     try {
         // Assigning values to the post object - using the id from the path in case the API consumer changes it
@@ -143,7 +146,7 @@ exports.updatePostById = (async (req, res) => {
 exports.deletePostById = (async (req, res) => {
     const id = req.params.id;
     const reqMethod = 'DELETE';
-    const methodName = 'deletePostById';
+    const methodName = 'deletePostById - ' + id;
 
     try {
         // Validate request
@@ -203,7 +206,7 @@ exports.findAllPosts = (async (req, res) => {
 exports.findCommentsByPostId = (async (req, res) => {
     const id = req.params.id;
     const reqMethod = 'GET';
-    const methodName = 'findCommentsByPostId';
+    const methodName = 'findCommentsByPostId - ' + id;
 
     try {
         // Validate request
